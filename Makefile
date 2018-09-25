@@ -1,4 +1,4 @@
-default: docs/main.html
+default: docs/index.html
 
-docs/main.html: src/main.elm
-  elm src/main.elm --output=docs/main.html
+docs/index.html: src/main.elm
+	elm make src/main.elm --output=docs/index.html
