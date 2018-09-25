@@ -1,5 +1,5 @@
 import Browser
-import Html exposing (Html, button, div, text, input, node, h1)
+import Html exposing (Html, button, div, text, input, node, h1, section, main_, h2)
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (..)
 import String exposing (split, pad)
@@ -70,11 +70,15 @@ update msg model =
 
 
 view : Model -> Html Msg
-view model = div [] ([
+view model = main_ [class "wrapper"] [
+          section [class "container"] ([
              h1 [] [text "Pfitzinger Marathon Training Calculator"],
+             h2 [] [text "Pacing"],
              timeView model,
+             h2 [] [text "Heart Rate"],
              hrView model
              ] ++ (map stylesheet milligram))
+          ]
 
 timeView : Model -> Html Msg
 timeView model =
