@@ -1,5 +1,5 @@
 import Browser
-import Html exposing (Html, button, div, text, input, node, h1, section, main_, h2)
+import Html exposing (Html, button, div, text, input, node, h1, section, main_, h2, h3)
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (..)
 import String exposing (split, pad)
@@ -76,7 +76,15 @@ view model = main_ [class "wrapper"] [
              h2 [] [text "Pacing"],
              timeView model,
              h2 [] [text "Heart Rate"],
-             hrView model
+             hrView model,
+             h2 [] [text "Aerobic Run"],
+             zoneView model aerobicZone,
+             h2 [] [text "Long Run"],
+             zoneView model longRunZone,
+             h2 [] [text "Marathon"],
+             zoneView model marathonZone,
+             h2 [] [text "Lactate Treshold Run"],
+             zoneView model lactateTreshold
              ] ++ (map stylesheet milligram))
           ]
 
@@ -98,11 +106,40 @@ paces =
   , ("Aerobic Min", 1.25)
   ]
 
+hrZones : List (String, Float, Float)
+hrZones =
+    [ ("Long Run", 0.65, 0.78)
+    -- , aerobicHR
+    , ("Lactate Treshold", 0.77, 0.88)
+    , ("Marathon Pace", 0.73, 0.84)
+    , ("Recovery", 0.6, 0.7)
+    ]
+
+type alias ZoneInfo = { minPace : Float, maxPace : Float, minHr : Float, maxHr : Float }
+
+aerobicZone : ZoneInfo
+aerobicZone = { minPace = 1.15, maxPace = 1.25, minHr = 0.62, maxHr = 0.75 }
+
+longRunZone : ZoneInfo
+longRunZone = { minPace = 1.1, maxPace = 1.2, minHr = 0.65, maxHr = 0.78 }
+
+marathonZone : ZoneInfo
+marathonZone = { minPace = 1, maxPace = 1, minHr = 0.73, maxHr = 0.84 }
+
+lactateTreshold : ZoneInfo
+lactateTreshold = { minPace = 0.9, maxPace = 0.8, minHr = 0.77, maxHr = 0.88 }
+
+mp : Time -> Time
+mp time = pace time 42.195
+
 stats : Time -> Html Msg
 stats time = let marathonPace = pace time 42.195
   in
     div []
     (map (\(s,m) -> div [] [ text (s ++ " Pace: " ++ (formatTime (mul marathonPace m)) ++ "/km") ]) paces)
+
+statsHelper : Time -> ZoneInfo -> Html Msg
+statsHelper marathonPace m = div [] [ text (" Pace: " ++ (formatTime (mul marathonPace m.maxPace)) ++ "-" ++  (formatTime (mul marathonPace m.minPace))++ "/km") ]
 
 
 hrView : Model -> Html Msg
@@ -121,23 +158,24 @@ hrView model =
 hrInfo : Model -> List (Html Msg)
 hrInfo model = [Maybe.withDefault (div [] [text "Can't parse"]) (Maybe.map hrStats (parseHR model))]
 
-hrZones : List (String, Float, Float)
-hrZones =
-    [ ("Long Run", 0.65, 0.78)
-    , ("Aerobic", 0.62, 0.75)
-    , ("Lactate Treshold", 0.77, 0.88)
-    , ("Marathon Pace", 0.73, 0.84)
-    , ("Recovery", 0.6, 0.7)
-    ]
+zoneView : Model -> ZoneInfo -> Html Msg
+zoneView model zone = div [] [
+   Maybe.withDefault (div [] [text "No Goal Pace"]) (Maybe.map (\time -> statsHelper (mp time) zone) (parseTime model.timeStr)),
+   Maybe.withDefault (div [] [text "No HR"]) (Maybe.map (\hr -> hrStatsHelper2 hr zone) (parseHR model))
+   ]
+
+hrStatsHelper2 : HeartRateInfo -> ZoneInfo -> Html Msg
+hrStatsHelper2 hr zone = div [] [text ((String.fromInt (mulHR hr zone.minHr)) ++ "-" ++ (String.fromInt (mulHR hr zone.maxHr)) ++ " bpm")]
+
 
 mulHR : HeartRateInfo -> Float -> Int
 mulHR hr m = hr.resting + (round (toFloat (hr.max - hr.resting) * m))
 
 hrStats : HeartRateInfo -> Html Msg
-hrStats hr = div []
-  (map (\(str, min, max) ->
-           div [] [text (str ++ ": " ++ (String.fromInt (mulHR hr min)) ++ "-" ++ (String.fromInt (mulHR hr max)) ++ " bpm")]
-      ) hrZones)
+hrStats hr = div [] (map (hrStatsHelper hr) hrZones)
+
+hrStatsHelper : HeartRateInfo -> (String, Float, Float) -> Html Msg
+hrStatsHelper hr (str, min, max) = div [] [text (str ++ ": " ++ (String.fromInt (mulHR hr min)) ++ "-" ++ (String.fromInt (mulHR hr max)) ++ " bpm")]
 
 stylesheet url =
     let
