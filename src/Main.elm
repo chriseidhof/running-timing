@@ -75,16 +75,15 @@ view model = main_ [class "wrapper"] [
              h1 [] [text "Pfitzinger Marathon Training Calculator"],
              h2 [] [text "Pacing"],
              timeView model,
-             h2 [] [text "Heart Rate"],
              hrView model,
-             h2 [] [text "Aerobic Run"],
-             zoneView model aerobicZone,
-             h2 [] [text "Long Run"],
-             zoneView model longRunZone,
              h2 [] [text "Marathon"],
              zoneView model marathonZone,
+             h2 [] [text "Long Run"],
+             zoneView model longRunZone,
              h2 [] [text "Lactate Treshold Run"],
              zoneView model lactateTreshold,
+             h2 [] [text "Aerobic Run"],
+             zoneView model aerobicZone,
              h2 [] [text "Recovery Run"],
              zoneView model recovery
              ] ++ (map stylesheet milligram))
@@ -94,10 +93,7 @@ timeView : Model -> Html Msg
 timeView model =
   div []
     ([ text "Marathon Time", input [ placeholder "Marathon Goal Time", value model.timeStr, onInput ChangeTime ] []
-    ] ++ info model)
-
-info : Model -> List (Html Msg)
-info model = [Maybe.withDefault (div [] [text "Can't parse"]) (Maybe.map stats (parseTime model.timeStr))]
+    ] )
 
 type alias ZoneInfo = { minPace : Float, maxPace : Float, minHr : Float, maxHr : Float }
 
@@ -119,10 +115,6 @@ recovery = { minPace = 1.25, maxPace = 1.15, minHr = 0.6, maxHr = 0.7 }
 mp : Time -> Time
 mp time = pace time 42.195
 
-stats : Time -> Html Msg
-stats time = let marathonPace = pace time 42.195
-  in div [] [ text ("Pace: " ++ (formatTime marathonPace) ++ "/km") ]
-
 statsHelper : Time -> ZoneInfo -> Html Msg
 statsHelper marathonPace m = div [] [ text (" Pace: " ++ (formatTime (mul marathonPace m.maxPace)) ++ "-" ++  (formatTime (mul marathonPace m.minPace))++ "/km") ]
 
@@ -143,21 +135,15 @@ hrView model =
 zoneView : Model -> ZoneInfo -> Html Msg
 zoneView model zone = div [] [
    Maybe.withDefault (div [] [text "No Goal Pace"]) (Maybe.map (\time -> statsHelper (mp time) zone) (parseTime model.timeStr)),
-   Maybe.withDefault (div [] [text "No HR"]) (Maybe.map (\hr -> hrStatsHelper2 hr zone) (parseHR model))
+   Maybe.withDefault (div [] [text "No HR"]) (Maybe.map (\hr -> hrStats hr zone) (parseHR model))
    ]
 
-hrStatsHelper2 : HeartRateInfo -> ZoneInfo -> Html Msg
-hrStatsHelper2 hr zone = div [] [text ((String.fromInt (mulHR hr zone.minHr)) ++ "-" ++ (String.fromInt (mulHR hr zone.maxHr)) ++ " bpm")]
+hrStats : HeartRateInfo -> ZoneInfo -> Html Msg
+hrStats hr zone = div [] [text ((String.fromInt (mulHR hr zone.minHr)) ++ "-" ++ (String.fromInt (mulHR hr zone.maxHr)) ++ " bpm")]
 
 
 mulHR : HeartRateInfo -> Float -> Int
 mulHR hr m = hr.resting + (round (toFloat (hr.max - hr.resting) * m))
-
--- hrStats : HeartRateInfo -> Html Msg
--- hrStats hr = div [] (map (hrStatsHelper hr) hrZones)
--- 
--- hrStatsHelper : HeartRateInfo -> (String, Float, Float) -> Html Msg
--- hrStatsHelper hr (str, min, max) = div [] [text (str ++ ": " ++ (String.fromInt (mulHR hr min)) ++ "-" ++ (String.fromInt (mulHR hr max)) ++ " bpm")]
 
 stylesheet url =
     let

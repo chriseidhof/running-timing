@@ -5033,8 +5033,67 @@ var author$project$Main$stylesheet = function (url) {
 var author$project$Main$ChangeTime = function (a) {
 	return {$: 'ChangeTime', a: a};
 };
+var author$project$Main$timeView = function (model) {
+	return A2(
+		elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				elm$html$Html$text('Marathon Time'),
+				A2(
+				elm$html$Html$input,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$placeholder('Marathon Goal Time'),
+						elm$html$Html$Attributes$value(model.timeStr),
+						elm$html$Html$Events$onInput(author$project$Main$ChangeTime)
+					]),
+				_List_Nil)
+			]));
+};
+var elm$core$Basics$round = _Basics_round;
+var author$project$Main$mulHR = F2(
+	function (hr, m) {
+		return hr.resting + elm$core$Basics$round((hr.max - hr.resting) * m);
+	});
+var author$project$Main$hrStats = F2(
+	function (hr, zone) {
+		return A2(
+			elm$html$Html$div,
+			_List_Nil,
+			_List_fromArray(
+				[
+					elm$html$Html$text(
+					elm$core$String$fromInt(
+						A2(author$project$Main$mulHR, hr, zone.minHr)) + ('-' + (elm$core$String$fromInt(
+						A2(author$project$Main$mulHR, hr, zone.maxHr)) + ' bpm')))
+				]));
+	});
 var author$project$Main$Seconds = function (a) {
 	return {$: 'Seconds', a: a};
+};
+var author$project$Main$pace = F2(
+	function (_n0, distance) {
+		var seconds = _n0.a;
+		return author$project$Main$Seconds(
+			elm$core$Basics$round(seconds / distance));
+	});
+var author$project$Main$mp = function (time) {
+	return A2(author$project$Main$pace, time, 42.195);
+};
+var elm$core$String$toInt = _String_toInt;
+var author$project$Main$parseHR = function (model) {
+	var _n0 = _Utils_Tuple2(
+		elm$core$String$toInt(model.restingHR),
+		elm$core$String$toInt(model.maxHR));
+	if ((_n0.a.$ === 'Just') && (_n0.b.$ === 'Just')) {
+		var r = _n0.a.a;
+		var m = _n0.b.a;
+		return elm$core$Maybe$Just(
+			{max: m, resting: r});
+	} else {
+		return elm$core$Maybe$Nothing;
+	}
 };
 var elm$core$List$map = F2(
 	function (f, xs) {
@@ -5050,7 +5109,6 @@ var elm$core$List$map = F2(
 			_List_Nil,
 			xs);
 	});
-var elm$core$String$toInt = _String_toInt;
 var author$project$Main$parseTime = function (time) {
 	var comps = A2(
 		elm$core$List$map,
@@ -5129,114 +5187,6 @@ var author$project$Main$formatTime = function (_n0) {
 		_Utils_chr('0'),
 		elm$core$String$fromInt(remainingSeconds)));
 };
-var elm$core$Basics$round = _Basics_round;
-var author$project$Main$pace = F2(
-	function (_n0, distance) {
-		var seconds = _n0.a;
-		return author$project$Main$Seconds(
-			elm$core$Basics$round(seconds / distance));
-	});
-var author$project$Main$stats = function (time) {
-	var marathonPace = A2(author$project$Main$pace, time, 42.195);
-	return A2(
-		elm$html$Html$div,
-		_List_Nil,
-		_List_fromArray(
-			[
-				elm$html$Html$text(
-				'Pace: ' + (author$project$Main$formatTime(marathonPace) + '/km'))
-			]));
-};
-var elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return elm$core$Maybe$Nothing;
-		}
-	});
-var elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
-var author$project$Main$info = function (model) {
-	return _List_fromArray(
-		[
-			A2(
-			elm$core$Maybe$withDefault,
-			A2(
-				elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						elm$html$Html$text('Can\'t parse')
-					])),
-			A2(
-				elm$core$Maybe$map,
-				author$project$Main$stats,
-				author$project$Main$parseTime(model.timeStr)))
-		]);
-};
-var author$project$Main$timeView = function (model) {
-	return A2(
-		elm$html$Html$div,
-		_List_Nil,
-		_Utils_ap(
-			_List_fromArray(
-				[
-					elm$html$Html$text('Marathon Time'),
-					A2(
-					elm$html$Html$input,
-					_List_fromArray(
-						[
-							elm$html$Html$Attributes$placeholder('Marathon Goal Time'),
-							elm$html$Html$Attributes$value(model.timeStr),
-							elm$html$Html$Events$onInput(author$project$Main$ChangeTime)
-						]),
-					_List_Nil)
-				]),
-			author$project$Main$info(model)));
-};
-var author$project$Main$mulHR = F2(
-	function (hr, m) {
-		return hr.resting + elm$core$Basics$round((hr.max - hr.resting) * m);
-	});
-var author$project$Main$hrStatsHelper2 = F2(
-	function (hr, zone) {
-		return A2(
-			elm$html$Html$div,
-			_List_Nil,
-			_List_fromArray(
-				[
-					elm$html$Html$text(
-					elm$core$String$fromInt(
-						A2(author$project$Main$mulHR, hr, zone.minHr)) + ('-' + (elm$core$String$fromInt(
-						A2(author$project$Main$mulHR, hr, zone.maxHr)) + ' bpm')))
-				]));
-	});
-var author$project$Main$mp = function (time) {
-	return A2(author$project$Main$pace, time, 42.195);
-};
-var author$project$Main$parseHR = function (model) {
-	var _n0 = _Utils_Tuple2(
-		elm$core$String$toInt(model.restingHR),
-		elm$core$String$toInt(model.maxHR));
-	if ((_n0.a.$ === 'Just') && (_n0.b.$ === 'Just')) {
-		var r = _n0.a.a;
-		var m = _n0.b.a;
-		return elm$core$Maybe$Just(
-			{max: m, resting: r});
-	} else {
-		return elm$core$Maybe$Nothing;
-	}
-};
 var author$project$Main$mul = F2(
 	function (_n0, d) {
 		var s = _n0.a;
@@ -5255,6 +5205,25 @@ var author$project$Main$statsHelper = F2(
 						A2(author$project$Main$mul, marathonPace, m.maxPace)) + ('-' + (author$project$Main$formatTime(
 						A2(author$project$Main$mul, marathonPace, m.minPace)) + '/km'))))
 				]));
+	});
+var elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return elm$core$Maybe$Nothing;
+		}
+	});
+var elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
 	});
 var author$project$Main$zoneView = F2(
 	function (model, zone) {
@@ -5293,7 +5262,7 @@ var author$project$Main$zoneView = F2(
 					A2(
 						elm$core$Maybe$map,
 						function (hr) {
-							return A2(author$project$Main$hrStatsHelper2, hr, zone);
+							return A2(author$project$Main$hrStats, hr, zone);
 						},
 						author$project$Main$parseHR(model)))
 				]));
@@ -5336,30 +5305,7 @@ var author$project$Main$view = function (model) {
 									elm$html$Html$text('Pacing')
 								])),
 							author$project$Main$timeView(model),
-							A2(
-							elm$html$Html$h2,
-							_List_Nil,
-							_List_fromArray(
-								[
-									elm$html$Html$text('Heart Rate')
-								])),
 							author$project$Main$hrView(model),
-							A2(
-							elm$html$Html$h2,
-							_List_Nil,
-							_List_fromArray(
-								[
-									elm$html$Html$text('Aerobic Run')
-								])),
-							A2(author$project$Main$zoneView, model, author$project$Main$aerobicZone),
-							A2(
-							elm$html$Html$h2,
-							_List_Nil,
-							_List_fromArray(
-								[
-									elm$html$Html$text('Long Run')
-								])),
-							A2(author$project$Main$zoneView, model, author$project$Main$longRunZone),
 							A2(
 							elm$html$Html$h2,
 							_List_Nil,
@@ -5373,9 +5319,25 @@ var author$project$Main$view = function (model) {
 							_List_Nil,
 							_List_fromArray(
 								[
+									elm$html$Html$text('Long Run')
+								])),
+							A2(author$project$Main$zoneView, model, author$project$Main$longRunZone),
+							A2(
+							elm$html$Html$h2,
+							_List_Nil,
+							_List_fromArray(
+								[
 									elm$html$Html$text('Lactate Treshold Run')
 								])),
 							A2(author$project$Main$zoneView, model, author$project$Main$lactateTreshold),
+							A2(
+							elm$html$Html$h2,
+							_List_Nil,
+							_List_fromArray(
+								[
+									elm$html$Html$text('Aerobic Run')
+								])),
+							A2(author$project$Main$zoneView, model, author$project$Main$aerobicZone),
 							A2(
 							elm$html$Html$h2,
 							_List_Nil,
