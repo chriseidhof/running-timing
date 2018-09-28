@@ -71,7 +71,7 @@ update msg model =
 
 view : Model -> Html Msg
 view model = main_ [class "wrapper"] [
-          section [class "container"] ([
+          section [class "container"] [
              h1 [] [text "Pfitzinger Marathon Training Calculator"],
              h2 [] [text "Pacing"],
              timeView model,
@@ -86,7 +86,7 @@ view model = main_ [class "wrapper"] [
              zoneView model aerobicZone,
              h2 [] [text "Recovery Run"],
              zoneView model recovery
-             ] ++ (map stylesheet milligram))
+             ]
           ]
 
 timeView : Model -> Html Msg
@@ -144,22 +144,3 @@ hrStats hr zone = div [] [text ((String.fromInt (mulHR hr zone.minHr)) ++ "-" ++
 
 mulHR : HeartRateInfo -> Float -> Int
 mulHR hr m = hr.resting + (round (toFloat (hr.max - hr.resting) * m))
-
-stylesheet url =
-    let
-        tag = "link"
-        attrs =
-            [ attribute "rel"       "stylesheet"
-            , attribute "property"  "stylesheet"
-            , attribute "href"      url
-            ]
-        children = []
-    in 
-        node tag attrs children
-
-milligram : List String
-milligram = 
-   [ "//fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic"
-   , "//cdn.rawgit.com/necolas/normalize.css/master/normalize.css"
-   , "//cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css"
-   ]
