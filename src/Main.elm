@@ -19,7 +19,7 @@ type alias Model = {
     }
 
 init : Model
-init = { timeStr = "2:52:00", restingHR = "55", maxHR = "205" }
+init = { timeStr = "2:40:00", restingHR = "50", maxHR = "195" }
 
 type Time = Seconds Int
 type alias HeartRateInfo = { resting: Int, max: Int }
@@ -110,7 +110,7 @@ lactateTreshold : ZoneInfo
 lactateTreshold = { minPace = 0.85, maxPace = 0.95, minHr = 0.77, maxHr = 0.88 }
 
 recovery : ZoneInfo
-recovery = { minPace = 1.25, maxPace = 1.15, minHr = 0.6, maxHr = 0.7 }
+recovery = { minPace = 1.15, maxPace = 1.25, minHr = 0.6, maxHr = 0.7 }
 
 mp : Time -> Time
 mp time = pace time 42.195

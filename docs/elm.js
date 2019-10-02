@@ -4326,7 +4326,7 @@ function _Browser_load(url)
 		}
 	}));
 }
-var author$project$Main$init = {maxHR: '205', restingHR: '55', timeStr: '2:52:00'};
+var author$project$Main$init = {maxHR: '195', restingHR: '50', timeStr: '2:40:00'};
 var author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -4993,7 +4993,7 @@ var author$project$Main$hrView = function (model) {
 var author$project$Main$lactateTreshold = {maxHr: 0.88, maxPace: 0.95, minHr: 0.77, minPace: 0.85};
 var author$project$Main$longRunZone = {maxHr: 0.78, maxPace: 1.2, minHr: 0.65, minPace: 1.1};
 var author$project$Main$marathonZone = {maxHr: 0.84, maxPace: 1, minHr: 0.73, minPace: 1};
-var author$project$Main$recovery = {maxHr: 0.7, maxPace: 1.15, minHr: 0.6, minPace: 1.25};
+var author$project$Main$recovery = {maxHr: 0.7, maxPace: 1.25, minHr: 0.6, minPace: 1.15};
 var author$project$Main$ChangeTime = function (a) {
 	return {$: 'ChangeTime', a: a};
 };
