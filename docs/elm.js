@@ -4326,7 +4326,7 @@ function _Browser_load(url)
 		}
 	}));
 }
-var author$project$Main$init = {maxHR: '195', restingHR: '50', timeStr: '2:40:00'};
+var author$project$Main$init = {maxHR: '200', restingHR: '50', timeStr: '2:40:00'};
 var author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
