@@ -19,7 +19,7 @@ type alias Model = {
     }
 
 init : Model
-init = { timeStr = "2:40:00", restingHR = "50", maxHR = "200" }
+init = { timeStr = "2:42:00", restingHR = "50", maxHR = "210" }
 
 type Time = Seconds Int
 type alias HeartRateInfo = { resting: Int, max: Int }
