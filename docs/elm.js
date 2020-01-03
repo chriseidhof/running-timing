@@ -5166,8 +5166,8 @@ var author$project$Main$statsHelper = F2(
 				[
 					elm$html$Html$text(
 					' Pace: ' + (author$project$Main$formatTime(
-						A2(author$project$Main$mul, marathonPace, m.maxPace)) + ('-' + (author$project$Main$formatTime(
-						A2(author$project$Main$mul, marathonPace, m.minPace)) + '/km'))))
+						A2(author$project$Main$mul, marathonPace, m.maxPace)) + ((_Utils_eq(m.maxPace, m.minPace) ? '' : ('-' + author$project$Main$formatTime(
+						A2(author$project$Main$mul, marathonPace, m.minPace)))) + '/km')))
 				]));
 	});
 var elm$core$Maybe$map = F2(
