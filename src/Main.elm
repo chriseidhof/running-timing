@@ -25,7 +25,7 @@ type alias Model =
 
 init : Model
 init =
-    { timeStr = "2:30:00", restingHR = "50", maxHR = "210" }
+    { timeStr = "2:25:00", restingHR = "45", maxHR = "205" }
 
 
 type Time
