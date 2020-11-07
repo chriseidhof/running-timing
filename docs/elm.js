@@ -5141,7 +5141,7 @@ var author$project$Main$powerStats = F2(
 				[
 					elm$html$Html$text(
 					elm$core$String$fromInt(
-						elm$core$Basics$round(hr.cp * zone.minPower)) + (' -' + (elm$core$String$fromInt(
+						elm$core$Basics$round(hr.cp * zone.minPower)) + ('-' + (elm$core$String$fromInt(
 						elm$core$Basics$round(hr.cp * zone.maxPower)) + ' W')))
 				]));
 	});

@@ -231,7 +231,7 @@ hrStats hr zone =
 
 powerStats : HeartRateInfo -> ZoneInfo -> Html Msg
 powerStats hr zone =
-    div [] [ text (String.fromInt (round ((toFloat hr.cp) * zone.minPower)) ++ " -" ++ String.fromInt (round ((toFloat hr.cp) * zone.maxPower)) ++ " W") ]
+    div [] [ text (String.fromInt (round ((toFloat hr.cp) * zone.minPower)) ++ "-" ++ String.fromInt (round ((toFloat hr.cp) * zone.maxPower)) ++ " W") ]
 
 
 mulHR : HeartRateInfo -> Float -> Int
