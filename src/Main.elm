@@ -20,12 +20,13 @@ type alias Model =
     { timeStr : String
     , restingHR : String
     , maxHR : String
+    , criticalPower: String
     }
 
 
 init : Model
 init =
-    { timeStr = "2:25:00", restingHR = "45", maxHR = "205" }
+    { timeStr = "2:25:00", restingHR = "45", maxHR = "200", criticalPower = "351" }
 
 
 type Time
@@ -33,14 +34,14 @@ type Time
 
 
 type alias HeartRateInfo =
-    { resting : Int, max : Int }
+    { resting : Int, max : Int, cp : Int }
 
 
 parseHR : Model -> Maybe HeartRateInfo
 parseHR model =
-    case ( String.toInt model.restingHR, String.toInt model.maxHR ) of
-        ( Just r, Just m ) ->
-            Just { resting = r, max = m }
+    case ( String.toInt model.restingHR, String.toInt model.maxHR, String.toInt model.criticalPower ) of
+        ( Just r, Just m, Just cp ) ->
+            Just { resting = r, max = m, cp = cp }
 
         _ ->
             Nothing
@@ -92,6 +93,7 @@ type Msg
     = ChangeTime String
     | ChangeRestingHR String
     | ChangeMaxHR String
+    | ChangeCP String
 
 
 mul : Time -> Float -> Time
@@ -111,7 +113,8 @@ update msg model =
         ChangeMaxHR str ->
             { model | maxHR = str }
 
-
+        ChangeCP str ->
+            { model | criticalPower = str }
 
 -- VIEW
 
@@ -147,32 +150,32 @@ timeView model =
 
 
 type alias ZoneInfo =
-    { minPace : Float, maxPace : Float, minHr : Float, maxHr : Float }
+    { minPace : Float, maxPace : Float, minHr : Float, maxHr : Float, minPower: Float, maxPower: Float }
 
 
 aerobicZone : ZoneInfo
 aerobicZone =
-    { minPace = 1.15, maxPace = 1.25, minHr = 0.62, maxHr = 0.75 }
+    { minPace = 1.15, maxPace = 1.25, minHr = 0.62, maxHr = 0.75, minPower = 0.75, maxPower = 0.85 }
 
 
 longRunZone : ZoneInfo
 longRunZone =
-    { minPace = 1.1, maxPace = 1.2, minHr = 0.65, maxHr = 0.78 }
+    { minPace = 1.1, maxPace = 1.2, minHr = 0.65, maxHr = 0.78, minPower = 0.8, maxPower = 0.9 }
 
 
 marathonZone : ZoneInfo
 marathonZone =
-    { minPace = 1, maxPace = 1, minHr = 0.73, maxHr = 0.84 }
+    { minPace = 1, maxPace = 1, minHr = 0.73, maxHr = 0.84, minPower = 0.92, maxPower = 1 }
 
 
 lactateTreshold : ZoneInfo
 lactateTreshold =
-    { minPace = 0.85, maxPace = 0.95, minHr = 0.77, maxHr = 0.88 }
+    { minPace = 0.85, maxPace = 0.95, minHr = 0.77, maxHr = 0.88, minPower = 0.95, maxPower = 1.05 }
 
 
 recovery : ZoneInfo
 recovery =
-    { minPace = 1.15, maxPace = 1.25, minHr = 0.6, maxHr = 0.7 }
+    { minPace = 1.15, maxPace = 1.25, minHr = 0.6, maxHr = 0.7, minPower = 0, maxPower = 0.8 }
 
 
 mp : Time -> Time
@@ -206,6 +209,10 @@ hrView model =
             [ text "Max Heart Rate"
             , input [ placeholder "Max Heart Rate", value model.maxHR, onInput ChangeMaxHR ] []
             ]
+        , div []
+            [ text "Critical Power"
+            , input [ placeholder "CriticalPower", value model.criticalPower, onInput ChangeCP ] []
+            ]
         ]
 
 
@@ -214,12 +221,17 @@ zoneView model zone =
     div []
         [ Maybe.withDefault (div [] [ text "No Goal Pace" ]) (Maybe.map (\time -> statsHelper (mp time) zone) (parseTime model.timeStr))
         , Maybe.withDefault (div [] [ text "No HR" ]) (Maybe.map (\hr -> hrStats hr zone) (parseHR model))
+        , Maybe.withDefault (div [] [ text "No CP" ]) (Maybe.map (\hr -> powerStats hr zone) (parseHR model))
         ]
 
 
 hrStats : HeartRateInfo -> ZoneInfo -> Html Msg
 hrStats hr zone =
     div [] [ text (String.fromInt (mulHR hr zone.minHr) ++ "-" ++ String.fromInt (mulHR hr zone.maxHr) ++ " bpm") ]
+
+powerStats : HeartRateInfo -> ZoneInfo -> Html Msg
+powerStats hr zone =
+    div [] [ text (String.fromInt (round ((toFloat hr.cp) * zone.minPower)) ++ " -" ++ String.fromInt (round ((toFloat hr.cp) * zone.maxPower)) ++ " W") ]
 
 
 mulHR : HeartRateInfo -> Float -> Int

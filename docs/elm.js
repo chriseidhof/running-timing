@@ -4326,7 +4326,7 @@ function _Browser_load(url)
 		}
 	}));
 }
-var author$project$Main$init = {maxHR: '205', restingHR: '45', timeStr: '2:25:00'};
+var author$project$Main$init = {criticalPower: '351', maxHR: '200', restingHR: '45', timeStr: '2:25:00'};
 var author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -4340,14 +4340,22 @@ var author$project$Main$update = F2(
 				return _Utils_update(
 					model,
 					{restingHR: str});
-			default:
+			case 'ChangeMaxHR':
 				var str = msg.a;
 				return _Utils_update(
 					model,
 					{maxHR: str});
+			default:
+				var str = msg.a;
+				return _Utils_update(
+					model,
+					{criticalPower: str});
 		}
 	});
-var author$project$Main$aerobicZone = {maxHr: 0.75, maxPace: 1.25, minHr: 0.62, minPace: 1.15};
+var author$project$Main$aerobicZone = {maxHr: 0.75, maxPace: 1.25, maxPower: 0.85, minHr: 0.62, minPace: 1.15, minPower: 0.75};
+var author$project$Main$ChangeCP = function (a) {
+	return {$: 'ChangeCP', a: a};
+};
 var author$project$Main$ChangeMaxHR = function (a) {
 	return {$: 'ChangeMaxHR', a: a};
 };
@@ -4987,13 +4995,29 @@ var author$project$Main$hrView = function (model) {
 								elm$html$Html$Events$onInput(author$project$Main$ChangeMaxHR)
 							]),
 						_List_Nil)
+					])),
+				A2(
+				elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$text('Critical Power'),
+						A2(
+						elm$html$Html$input,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$placeholder('CriticalPower'),
+								elm$html$Html$Attributes$value(model.criticalPower),
+								elm$html$Html$Events$onInput(author$project$Main$ChangeCP)
+							]),
+						_List_Nil)
 					]))
 			]));
 };
-var author$project$Main$lactateTreshold = {maxHr: 0.88, maxPace: 0.95, minHr: 0.77, minPace: 0.85};
-var author$project$Main$longRunZone = {maxHr: 0.78, maxPace: 1.2, minHr: 0.65, minPace: 1.1};
-var author$project$Main$marathonZone = {maxHr: 0.84, maxPace: 1, minHr: 0.73, minPace: 1};
-var author$project$Main$recovery = {maxHr: 0.7, maxPace: 1.25, minHr: 0.6, minPace: 1.15};
+var author$project$Main$lactateTreshold = {maxHr: 0.88, maxPace: 0.95, maxPower: 1.05, minHr: 0.77, minPace: 0.85, minPower: 0.95};
+var author$project$Main$longRunZone = {maxHr: 0.78, maxPace: 1.2, maxPower: 0.9, minHr: 0.65, minPace: 1.1, minPower: 0.8};
+var author$project$Main$marathonZone = {maxHr: 0.84, maxPace: 1, maxPower: 1, minHr: 0.73, minPace: 1, minPower: 0.92};
+var author$project$Main$recovery = {maxHr: 0.7, maxPace: 1.25, maxPower: 0.8, minHr: 0.6, minPace: 1.15, minPower: 0};
 var author$project$Main$ChangeTime = function (a) {
 	return {$: 'ChangeTime', a: a};
 };
@@ -5047,14 +5071,16 @@ var author$project$Main$mp = function (time) {
 };
 var elm$core$String$toInt = _String_toInt;
 var author$project$Main$parseHR = function (model) {
-	var _n0 = _Utils_Tuple2(
+	var _n0 = _Utils_Tuple3(
 		elm$core$String$toInt(model.restingHR),
-		elm$core$String$toInt(model.maxHR));
-	if ((_n0.a.$ === 'Just') && (_n0.b.$ === 'Just')) {
+		elm$core$String$toInt(model.maxHR),
+		elm$core$String$toInt(model.criticalPower));
+	if (((_n0.a.$ === 'Just') && (_n0.b.$ === 'Just')) && (_n0.c.$ === 'Just')) {
 		var r = _n0.a.a;
 		var m = _n0.b.a;
+		var cp = _n0.c.a;
 		return elm$core$Maybe$Just(
-			{max: m, resting: r});
+			{cp: cp, max: m, resting: r});
 	} else {
 		return elm$core$Maybe$Nothing;
 	}
@@ -5106,6 +5132,19 @@ var author$project$Main$parseTime = function (time) {
 	}
 	return elm$core$Maybe$Nothing;
 };
+var author$project$Main$powerStats = F2(
+	function (hr, zone) {
+		return A2(
+			elm$html$Html$div,
+			_List_Nil,
+			_List_fromArray(
+				[
+					elm$html$Html$text(
+					elm$core$String$fromInt(
+						elm$core$Basics$round(hr.cp * zone.minPower)) + (' -' + (elm$core$String$fromInt(
+						elm$core$Basics$round(hr.cp * zone.maxPower)) + ' W')))
+				]));
+	});
 var elm$core$Basics$modBy = _Basics_modBy;
 var elm$core$String$cons = _String_cons;
 var elm$core$String$fromChar = function (_char) {
@@ -5227,6 +5266,21 @@ var author$project$Main$zoneView = F2(
 						elm$core$Maybe$map,
 						function (hr) {
 							return A2(author$project$Main$hrStats, hr, zone);
+						},
+						author$project$Main$parseHR(model))),
+					A2(
+					elm$core$Maybe$withDefault,
+					A2(
+						elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								elm$html$Html$text('No CP')
+							])),
+					A2(
+						elm$core$Maybe$map,
+						function (hr) {
+							return A2(author$project$Main$powerStats, hr, zone);
 						},
 						author$project$Main$parseHR(model)))
 				]));
