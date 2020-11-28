@@ -4326,7 +4326,7 @@ function _Browser_load(url)
 		}
 	}));
 }
-var author$project$Main$init = {criticalPower: '351', maxHR: '200', restingHR: '45', timeStr: '2:25:00'};
+var author$project$Main$init = {criticalPower: '378', maxHR: '200', restingHR: '45', timeStr: '2:25:00'};
 var author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
