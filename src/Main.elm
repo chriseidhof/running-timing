@@ -26,7 +26,7 @@ type alias Model =
 
 init : Model
 init =
-    { timeStr = "2:25:00", restingHR = "45", maxHR = "200", criticalPower = "378" }
+    { timeStr = "2:30:00", restingHR = "45", maxHR = "200", criticalPower = "378" }
 
 
 type Time
@@ -51,7 +51,7 @@ parseTime : String -> Maybe Time
 parseTime time =
     let
         comps =
-            split ":" time |> map String.toInt
+            split ":" time |> List.map String.toInt
     in
     case comps of
         [ Just h, Just m ] ->
