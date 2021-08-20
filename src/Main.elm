@@ -1,7 +1,7 @@
 module Main exposing (Distance, HeartRateInfo, Model, Msg(..), Time(..), ZoneInfo, aerobicZone, formatTime, hrStats, hrView, init, lactateTreshold, longRunZone, main, marathonZone, mp, mul, mulHR, pace, parseHR, parseTime, recovery, statsHelper, timeView, update, view, zoneView)
 
 import Browser
-import Html exposing (Html, button, div, h1, h2, h3, input, main_, node, section, text)
+import Html exposing (Html, button, div, h1, h2, h3, input, main_, node, section, text, label, fieldset)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import List exposing (map)
@@ -15,18 +15,20 @@ main =
 
 -- MODEL
 
+type System = Metric | Imperial
 
 type alias Model =
     { timeStr : String
     , restingHR : String
     , maxHR : String
     , criticalPower: String
+    , system: System
     }
 
 
 init : Model
 init =
-    { timeStr = "2:30:00", restingHR = "45", maxHR = "200", criticalPower = "378" }
+    { timeStr = "2:30:00", restingHR = "45", maxHR = "200", criticalPower = "378", system = Metric }
 
 
 type Time
@@ -94,6 +96,7 @@ type Msg
     | ChangeRestingHR String
     | ChangeMaxHR String
     | ChangeCP String
+    | ChangeSystem System
 
 
 mul : Time -> Float -> Time
@@ -116,6 +119,9 @@ update msg model =
         ChangeCP str ->
             { model | criticalPower = str }
 
+        ChangeSystem sys ->
+            { model | system = sys }
+
 -- VIEW
 
 
@@ -124,6 +130,7 @@ view model =
     main_ [ class "wrapper" ]
         [ section [ class "container" ]
             [ h1 [] [ text "Pfitzinger Marathon Training Calculator" ]
+            , chooseSystem model
             , h2 [] [ text "Pacing" ]
             , timeView model
             , hrView model
@@ -140,6 +147,22 @@ view model =
             ]
         ]
 
+
+radio : String -> Bool -> msg -> Html msg
+radio value isChecked msg =
+  label [ ]
+    [ input [ type_ "radio", name "system", onInput (\_ -> msg), checked isChecked ] []
+    , text value
+    ]
+
+chooseSystem : Model -> Html Msg
+chooseSystem model =
+        div []
+                [ fieldset []
+                [ radio "Metric" (model.system == Metric) (ChangeSystem Metric)
+                , radio "Imperial"(model.system == Imperial)  (ChangeSystem Imperial)
+                ]
+        ]
 
 timeView : Model -> Html Msg
 timeView model =
@@ -178,13 +201,13 @@ recovery =
     { minPace = 1.15, maxPace = 1.25, minHr = 0.6, maxHr = 0.7, minPower = 0, maxPower = 0.8 }
 
 
-mp : Time -> Time
-mp time =
-    pace time 42.195
+mp : System -> Time -> Time
+mp system time =
+    pace time (if system == Metric then 42.195 else 26.2) -- todo exact distance in miles
 
 
-statsHelper : Time -> ZoneInfo -> Html Msg
-statsHelper marathonPace m =
+statsHelper : System -> Time -> ZoneInfo -> Html Msg
+statsHelper system marathonPace m =
     div []
         [ text
             (" Pace: " ++ formatTime (mul marathonPace m.maxPace)
@@ -193,7 +216,7 @@ statsHelper marathonPace m =
                     else
                         "-" ++ formatTime (mul marathonPace m.minPace)
                    )
-                ++ "/km"
+                ++ (if system == Metric then "/km" else "/mi")
             )
         ]
 
@@ -219,7 +242,7 @@ hrView model =
 zoneView : Model -> ZoneInfo -> Html Msg
 zoneView model zone =
     div []
-        [ Maybe.withDefault (div [] [ text "No Goal Pace" ]) (Maybe.map (\time -> statsHelper (mp time) zone) (parseTime model.timeStr))
+        [ Maybe.withDefault (div [] [ text "No Goal Pace" ]) (Maybe.map (\time -> statsHelper model.system (mp model.system time) zone) (parseTime model.timeStr))
         , Maybe.withDefault (div [] [ text "No HR" ]) (Maybe.map (\hr -> hrStats hr zone) (parseHR model))
         , Maybe.withDefault (div [] [ text "No CP" ]) (Maybe.map (\hr -> powerStats hr zone) (parseHR model))
         ]

@@ -4326,7 +4326,8 @@ var _Bitwise_shiftRightZfBy = F2(function(offset, a)
 {
 	return a >>> offset;
 });
-var $author$project$Main$init = {criticalPower: '378', maxHR: '200', restingHR: '45', timeStr: '2:30:00'};
+var $author$project$Main$Metric = {$: 'Metric'};
+var $author$project$Main$init = {criticalPower: '378', maxHR: '200', restingHR: '45', system: $author$project$Main$Metric, timeStr: '2:30:00'};
 var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
@@ -5155,14 +5156,36 @@ var $author$project$Main$update = F2(
 				return _Utils_update(
 					model,
 					{maxHR: str});
-			default:
+			case 'ChangeCP':
 				var str = msg.a;
 				return _Utils_update(
 					model,
 					{criticalPower: str});
+			default:
+				var sys = msg.a;
+				return _Utils_update(
+					model,
+					{system: sys});
 		}
 	});
 var $author$project$Main$aerobicZone = {maxHr: 0.75, maxPace: 1.25, maxPower: 0.85, minHr: 0.62, minPace: 1.15, minPower: 0.75};
+var $author$project$Main$ChangeSystem = function (a) {
+	return {$: 'ChangeSystem', a: a};
+};
+var $author$project$Main$Imperial = {$: 'Imperial'};
+var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$html$Html$fieldset = _VirtualDom_node('fieldset');
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$label = _VirtualDom_node('label');
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -5171,20 +5194,7 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			key,
 			$elm$json$Json$Encode$string(string));
 	});
-var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
-var $elm$html$Html$h1 = _VirtualDom_node('h1');
-var $elm$html$Html$h2 = _VirtualDom_node('h2');
-var $author$project$Main$ChangeCP = function (a) {
-	return {$: 'ChangeCP', a: a};
-};
-var $author$project$Main$ChangeMaxHR = function (a) {
-	return {$: 'ChangeMaxHR', a: a};
-};
-var $author$project$Main$ChangeRestingHR = function (a) {
-	return {$: 'ChangeRestingHR', a: a};
-};
-var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$Attributes$name = $elm$html$Html$Attributes$stringProperty('name');
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
@@ -5219,9 +5229,69 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			$elm$html$Html$Events$alwaysStop,
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
-var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $author$project$Main$radio = F3(
+	function (value, isChecked, msg) {
+		return A2(
+			$elm$html$Html$label,
+			_List_Nil,
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$input,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$type_('radio'),
+							$elm$html$Html$Attributes$name('system'),
+							$elm$html$Html$Events$onInput(
+							function (_v0) {
+								return msg;
+							}),
+							$elm$html$Html$Attributes$checked(isChecked)
+						]),
+					_List_Nil),
+					$elm$html$Html$text(value)
+				]));
+	});
+var $author$project$Main$chooseSystem = function (model) {
+	return A2(
+		$elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$fieldset,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A3(
+						$author$project$Main$radio,
+						'Metric',
+						_Utils_eq(model.system, $author$project$Main$Metric),
+						$author$project$Main$ChangeSystem($author$project$Main$Metric)),
+						A3(
+						$author$project$Main$radio,
+						'Imperial',
+						_Utils_eq(model.system, $author$project$Main$Imperial),
+						$author$project$Main$ChangeSystem($author$project$Main$Imperial))
+					]))
+			]));
+};
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
+var $elm$html$Html$h1 = _VirtualDom_node('h1');
+var $elm$html$Html$h2 = _VirtualDom_node('h2');
+var $author$project$Main$ChangeCP = function (a) {
+	return {$: 'ChangeCP', a: a};
+};
+var $author$project$Main$ChangeMaxHR = function (a) {
+	return {$: 'ChangeMaxHR', a: a};
+};
+var $author$project$Main$ChangeRestingHR = function (a) {
+	return {$: 'ChangeRestingHR', a: a};
+};
+var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$hrView = function (model) {
 	return A2(
@@ -5343,9 +5413,13 @@ var $author$project$Main$pace = F2(
 		return $author$project$Main$Seconds(
 			$elm$core$Basics$round(seconds / distance));
 	});
-var $author$project$Main$mp = function (time) {
-	return A2($author$project$Main$pace, time, 42.195);
-};
+var $author$project$Main$mp = F2(
+	function (system, time) {
+		return A2(
+			$author$project$Main$pace,
+			time,
+			_Utils_eq(system, $author$project$Main$Metric) ? 42.195 : 26.2);
+	});
 var $author$project$Main$parseHR = function (model) {
 	var _v0 = _Utils_Tuple3(
 		$elm$core$String$toInt(model.restingHR),
@@ -5457,8 +5531,8 @@ var $author$project$Main$mul = F2(
 		return $author$project$Main$Seconds(
 			$elm$core$Basics$round(s * d));
 	});
-var $author$project$Main$statsHelper = F2(
-	function (marathonPace, m) {
+var $author$project$Main$statsHelper = F3(
+	function (system, marathonPace, m) {
 		return A2(
 			$elm$html$Html$div,
 			_List_Nil,
@@ -5467,7 +5541,7 @@ var $author$project$Main$statsHelper = F2(
 					$elm$html$Html$text(
 					' Pace: ' + ($author$project$Main$formatTime(
 						A2($author$project$Main$mul, marathonPace, m.maxPace)) + ((_Utils_eq(m.maxPace, m.minPace) ? '' : ('-' + $author$project$Main$formatTime(
-						A2($author$project$Main$mul, marathonPace, m.minPace)))) + '/km')))
+						A2($author$project$Main$mul, marathonPace, m.minPace)))) + (_Utils_eq(system, $author$project$Main$Metric) ? '/km' : '/mi'))))
 				]));
 	});
 var $elm$core$Maybe$withDefault = F2(
@@ -5498,9 +5572,10 @@ var $author$project$Main$zoneView = F2(
 					A2(
 						$elm$core$Maybe$map,
 						function (time) {
-							return A2(
+							return A3(
 								$author$project$Main$statsHelper,
-								$author$project$Main$mp(time),
+								model.system,
+								A2($author$project$Main$mp, model.system, time),
 								zone);
 						},
 						$author$project$Main$parseTime(model.timeStr))),
@@ -5560,6 +5635,7 @@ var $author$project$Main$view = function (model) {
 							[
 								$elm$html$Html$text('Pfitzinger Marathon Training Calculator')
 							])),
+						$author$project$Main$chooseSystem(model),
 						A2(
 						$elm$html$Html$h2,
 						_List_Nil,
